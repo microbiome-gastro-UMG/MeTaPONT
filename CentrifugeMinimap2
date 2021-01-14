@@ -1,0 +1,208 @@
+#!/bin/bash
+#  This is a wrapper script for automation of Centrifuge plus minimap2 classification and preparation for R usage
+#  by Tim van den Berg
+#
+
+#/sybig/home/projects/AG_Neesse/skripte/CentrifugeMinimap2  -i /sybig/home/projects/AG_Neesse/test/new/fastqFolder/FAO34215_pass_barcode07_6e67374a_0.fastq -o /sybig/home/projects/AG_Neesse/test/new/outputFolder/ -t 7 -j p
+
+startTime=$(date +%s.%N)
+
+echo ""
+
+how_to_use="
+  $(basename "$0") [-i fastq_file or directory] [-o output_directory] [-t threads] \n
+  \n\n
+  -i <Path> \t path to fastq file or a directory that contains fastq files.\n
+  \n
+  -o <Path> \t path to output directory.\n
+  \n
+  -j <p+h+v | p | abv> \t decides the used reference dataset for Centrifuge [abv]. \n
+  \n
+  -c \t just Centrifuge will be used [Centrifuge + Minimap2].\n
+  \n
+  -k <Int> \t max number of TaxIDs returned by Centrifuge, only if -c [5].\n
+  \n
+  -t <Int> \t number of threads used by Centrifuge and MMP2 [1].\n
+  \n
+  --threshold <Int> \t taxIDs in centrifuge_out.tsv are omitted when score is lower than threshold [150].\n
+  \n
+  --filter <int,int> \t thresholds for minimap2 output. First int is Smith-Waterman-AS threshold, second is coverage threshold (0-100). [50:20]\n
+  \n
+  --filter-benchmarking <int,...,int:int,int:...> \t two lists of minimap cutoff values of int. Every combination will be saved.\n
+  \n"
+
+reference_seqs="/sybig/home/projects/AG_Neesse/programme/centrifuge/centrifuge-1.0.4-beta/indices/abv/abv"
+c="false"
+k=5
+threads=1
+threshold=150
+mmp_thresholds="50,20"
+mmp_thresholds_benchmarking="0"
+
+while :; do
+  case "$1" in
+  -h | --help)
+    echo -e "$how_to_use"
+    exit 0
+    ;;
+
+  -i)
+    fastq_file=$(readlink -f "$2")
+    shift 2
+    if [ -f "$fastq_file" ]; then
+      echo "FastQ File: $fastq_file"
+
+    elif [ -d "$fastq_file" ]; then
+      echo "FastQ directory: $fastq_file"
+
+    else
+      echo "The File or directory $fastq_file does not exist."
+      exit 1
+    fi
+    ;;
+
+  -o)
+    output_directory=$(readlink -f "$2")
+    shift 2
+    if [ -d "$output_directory" ]; then
+      echo "Output Directory: $output_directory"
+    else
+      echo "The Output Directory $output_directory does not exist."
+      exit 1
+    fi
+    ;;
+
+  -j)
+    if [ "$2" = "p+h+v" ]; then
+      reference_seqs="/sybig/home/projects/AG_Neesse/programme/centrifuge/centrifuge-1.0.4-beta/indices/2016_human_pro/p+h+v"
+    elif [ "$2" = "p" ]; then
+      reference_seqs="/sybig/home/projects/AG_Neesse/programme/centrifuge/centrifuge-1.0.4-beta/indices/2018_pro/p_compressed"
+    elif [ "$2" = "abv" ]; then
+      reference_seqs="/sybig/home/projects/AG_Neesse/programme/centrifuge/centrifuge-1.0.4-beta/indices/abv/abv"
+    else
+      echo "illegal parameter: -j $2"
+      exit 1
+    fi
+
+    shift 2
+    echo "Reference sequences: $reference_seqs"
+    ;;
+
+  -c)
+    c=true
+    shift 1
+    echo "Only Centrifuge will be used."
+    ;;
+
+  -t)
+    threads=$2
+    shift 2
+    echo "Number of CPU threads: $threads"
+    ;;
+  --threshold)
+    threshold=$2
+    shift 2
+    echo "Score threshold of centrifuge output: $threshold"
+    ;;
+  --filter)
+    mmp_thresholds=$2
+    shift 2
+    echo "Alignment score threshold, Coverage threshold of minimap 2 output: $mmp_thresholds"
+    ;;
+  --filter-benchmarking)
+    mmp_thresholds_benchmarking=$2
+    shift 2
+    echo "minimap 2 benchmarking input: $mmp_thresholds_benchmarking"
+    ;;
+  -k)
+    k=$2
+    shift 2
+    echo "Maximum Number of TaxIDs returned by Centrifuge: $k"
+    ;;
+  --) # End of all options
+    shift
+    break
+    ;;
+  -*)
+    echo "Error: Unknown option: $1" >&2
+    ## or call function display_help
+    exit 1
+    ;;
+  *) # No more options
+    break
+    ;;
+  esac
+done
+
+echo ""
+echo ""
+
+#  If directory input prepare fastq file by merging it all into one file
+if [ -d "$fastq_file" ]; then
+  cd "$fastq_file" || exit
+  echo "concatenating .fastq files..."
+  rm -f "$fastq_file/concatenated_fastq_files.fastq"
+  find "$fastq_file" -name 'concatenated_fastq_files.fastq' -prune -o -name '*.fastq' -exec cat {} + >"$fastq_file"/concatenated_fastq_files.fastq
+  fastq_file="$fastq_file/concatenated_fastq_files.fastq"
+fi
+
+# running centrifuge
+echo "running centrifuge"
+echo ""
+rm -f "$output_directory/centrifuge_out.tsv"
+rm -f "$output_directory/centrifuge_report_out"
+
+if [ "$c" = true ]; then # just centrifuge
+  centrifuge -x "$reference_seqs" -k "$k" -U "$fastq_file" -S "$output_directory/centrifuge_out.tsv" --threads "$threads" --report-file "$output_directory/centrifuge_report_out.tsv"
+  python /sybig/home/projects/AG_Neesse/skripte/centrifuge_processing.py "$output_directory" "$threshold" "c"
+
+else
+  # centrifuge and MMP2
+
+  centrifuge -x "$reference_seqs" -k "1000" -U "$fastq_file" -S "$output_directory/centrifuge_out.tsv" --threads "$threads"
+  python /sybig/home/projects/AG_Neesse/skripte/centrifuge_processing.py "$output_directory" "$threshold" "cm"
+
+  #MINIMAP2
+
+  echo "running Minimap 2"
+
+  #index fastq_file
+  /sybig/home/projects/AG_Neesse/programme/cdbfasta/cdbfasta "$fastq_file" -Q
+
+  mkdir "$output_directory/minimap2output"
+
+  for taxID in $(tail --lines=+2 "$output_directory/centrifuge_out.tsv" | cut -f3 | sort -n | uniq | grep -v -e "^0$"); do
+    echo "TaxID currently processed by minimap2: $taxID"
+
+    rm -f "$output_directory/minimap2output/temp.fq"
+    touch "$output_directory/minimap2output/temp.fq"
+
+    awk -v taxID="$taxID" -F"\t" '$3 == taxID' "$output_directory/centrifuge_out.tsv" | cut -f1 |
+      /sybig/home/projects/AG_Neesse/programme/cdbfasta/cdbyank "$fastq_file.cidx" \
+        -o "$output_directory/minimap2output/temp.fq"
+
+    minimap2 -2 -c --secondary=no -t "$threads" -x map-ont "$(dirname $reference_seqs)/fastaDB/fastaTaxID/$taxID" \
+      "$output_directory/minimap2output/temp.fq" >"$output_directory/minimap2output/$taxID.paf"
+    echo ""
+
+  done
+
+  rm -f "$output_directory"/minimap2output/temp.fq
+  rm -f "$fastq_file".cidx
+
+  # build files with single hit outputs, best quality and nonzero Quality
+  find "$output_directory/minimap2output" -size 0 -delete
+
+  python /sybig/home/projects/AG_Neesse/skripte/mmp2_processing.py "$output_directory" "$mmp_thresholds" "$mmp_thresholds_benchmarking"
+  rm -rf "$output_directory/minimap2output/"
+
+fi
+
+endTime=$(date +%s.%N)
+echo ""
+echo "the skript ran for:"
+eval "echo $(date -ud "@$(echo "$endTime - $startTime" | bc)" +'$((%s/3600/24)) days %H hours %M minutes %S seconds.')"
+
+# parallelisieren
+# https://unix.stackexchange.com/questions/103920/parallelize-a-bash-for-loop
+# https://unix.stackexchange.com/questions/417801/parallelism-in-bash-scripting
