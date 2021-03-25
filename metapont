@@ -1,0 +1,215 @@
+#!/bin/bash
+#  This is a wrapper script for automation of Centrifuge plus minimap2 classification and preparation for R usage
+#  by Tim van den Berg
+#
+
+#
+
+startTime=$(date +%s.%N)
+
+echo ""
+
+how_to_use="
+  Docker run -v /path/to/database:/database -v /path/to/input:/input -v /path/to/output/directory:/output ContainerName [Parameters] \n
+  \n\n
+  Change /path/to/database to the absolute path of the database directory you want to use.\n
+  Change /path/to/input to your absolute path to the input fastq file or a directory that contains fastq files.\n
+  Change /path/to/output to the absolute path to the directory you want the output in.\n
+  \n
+  -c \t just Centrifuge will be used [Centrifuge + Minimap2].\n
+  -k <Int> \t max number of TaxIDs returned by Centrifuge, only if -c [5].\n
+  -t <Int> \t number of threads used by Centrifuge and MMP2 [1].\n
+  --threshold <Int> \t taxIDs in centrifuge_out.tsv are omitted when score is lower than threshold [150].\n
+  --filter <Int:Int> \t thresholds for minimap2 output. First int is the normalized Smith-Waterman-AS threshold, second is coverage threshold (0-100). [1000:50]\n
+  --filter-benchmarking <int,...,int:int,int:...> \t two lists of minimap cutoff values of int. Every combination will be saved.\n
+  --normalize < 0 | 1 > decides if Smith Waterman score should be normalized with the alignment length (1) or not (0) [1]\n
+  --redundance <Int> \t readID with centrifuge hits to at least redundance taxIDs will be dropped, only if not -c [50].\n
+  --verbose \t gives more files as output.\n
+  \n"
+
+fastq_file="/input/"
+output_directory="/output/"
+tmp_directory="/files/"
+verbose="false"
+c="false"
+k="5"
+threads="1"
+threshold="150"
+mmp_thresholds="1000:50"
+mmp_thresholds_benchmarking="0"
+normalize="true"
+redundance="50"
+
+reference_seqs="/database/" #will be changed further down.
+
+while :; do
+  case "$1" in
+  -h | --help)
+    echo -e "$how_to_use"
+    exit 0
+    ;;
+
+  -c)
+    c="true"
+    shift 1
+    echo "Only Centrifuge will be used."
+    ;;
+
+  -t)
+    threads="$2"
+    shift 2
+    echo "Number of CPU threads: $threads"
+    ;;
+  --threshold)
+    threshold="$2"
+    shift 2
+    echo "Score threshold of centrifuge output: $threshold"
+    ;;
+  --filter)
+    mmp_thresholds="$2"
+    shift 2
+    echo "Alignment score threshold, Coverage threshold of minimap 2 output: $mmp_thresholds"
+    ;;
+  --filter-benchmarking)
+    mmp_thresholds_benchmarking="$2"
+    shift 2
+    echo "minimap 2 benchmarking input: $mmp_thresholds_benchmarking"
+    ;;
+  -k)
+    k="$2"
+    shift 2
+    echo "Maximum Number of TaxIDs returned by Centrifuge: $k"
+    ;;
+  --redundance)
+    redundance="$2"
+    shift 2
+    echo "redundance threshold of centrifuge output: $redundance"
+    ;;
+  --normalize)
+    if [ "$2" = "1" ]; then
+      normalize="false"
+    else
+      normalize="true"
+    fi
+    shift 2
+    echo "Normalization of Smith Waterman Score: $normalize"
+    ;;
+  --verbose)
+    verbose="true"
+    shift 1
+    echo "You will get more files."
+    ;;
+  --) # End of all options
+    shift
+    break
+    ;;
+  -*)
+    echo "Error: Unknown option: $1" >&2
+    ## or call function display_help
+    exit 1
+    ;;
+  *) # No more options
+    break
+    ;;
+  esac
+done
+
+echo ""
+echo ""
+
+#  concatenate fasq files in input directory
+#rm -f "$tmp_directory/concatenated_fastq_files.fastq"
+echo "concatenating .fastq files..."
+find "$fastq_file" -name 'concatenated_fastq_files.fastq' -prune -o -name '*.fastq' -exec cat {} + >"$tmp_directory/concatenated_fastq_files.fastq"
+fastq_file="$tmp_directory/concatenated_fastq_files.fastq"
+chmod -f 777 "$fastq_file"
+
+# running centrifuge
+echo "running centrifuge"
+echo ""
+
+cd "$reference_seqs" || exit
+
+reference_seqs="$reference_seqs/$(find *.cf | head -n1 | cut -d. -f1)"
+
+if [ "$c" = "true" ]; then # just centrifuge
+  centrifuge -x "$reference_seqs" -k "$k" -U "$fastq_file" -S "$output_directory/centrifuge_out.tsv" --threads "$threads" --quiet
+  chmod -f 666 "$output_directory/centrifuge_out.tsv"
+  python3 /src/centrifuge_processing.py "$output_directory" "$threshold" "c" "$redundance"
+  chmod -f 666 "$output_directory/centrifuge_out.tsv"
+  chmod -f 666 "$output_directory/centrifuge_out_unique.tsv"
+  chmod -f 666 "$output_directory/centrifuge_readIDTaxID.tsv"
+
+else
+  # centrifuge and MMP2
+
+  centrifuge -x "$reference_seqs" -k "1000" -U "$fastq_file" -S "$tmp_directory/centrifuge_out.tsv" --threads "$threads" --quiet
+  echo "clean centrifuge output"
+  echo ""
+  python3 /src/centrifuge_processing.py "$tmp_directory" "$threshold" "cm" "$redundance"
+  cp -fbv "$tmp_directory/centrifuge_out.tsv" "$output_directory"
+  chmod -f 666 "$output_directory/centrifuge_out.tsv"
+
+  #MINIMAP2
+
+  echo "running Minimap 2"
+
+  #index fastq_file
+  cdbfasta "$fastq_file" -Q
+
+  rm -rf "$tmp_directory/minimap2output"
+  mkdir "$tmp_directory/minimap2output"
+
+  for taxID in $(tail --lines=+2 "$tmp_directory/centrifuge_out.tsv" | cut -f3 | sort -n | uniq | grep -v -e "^0$"); do
+    echo "TaxID currently processed by minimap2: $taxID"
+
+    rm -f "$tmp_directory/minimap2output/temp.fq"
+    touch "$tmp_directory/minimap2output/temp.fq"
+
+    awk -v taxID="$taxID" -F"\t" '$3 == taxID' "$tmp_directory/centrifuge_out.tsv" | cut -f1 |
+      cdbyank "$fastq_file.cidx" -o "$tmp_directory/minimap2output/temp.fq"
+
+    minimap2 -2 -c --secondary=no -t "$threads" -x map-ont "$(dirname $reference_seqs)/fastaTaxID/$taxID.gz" \
+      "$tmp_directory/minimap2output/temp.fq" >"$tmp_directory/minimap2output/$taxID.paf"
+    echo ""
+
+  done
+
+  rm -f "$tmp_directory"/minimap2output/temp.fq
+  rm -f "$fastq_file".cidx
+
+  # build files with single hit outputs, best quality and nonzero Quality
+  find "$tmp_directory/minimap2output" -size 0 -delete
+
+  python3 /src/mmp2_processing.py "$tmp_directory" "$mmp_thresholds" "$mmp_thresholds_benchmarking" "$normalize"
+  echo "python /src/mmp2_processing.py $tmp_directory $mmp_thresholds $mmp_thresholds_benchmarking $normalize"
+
+fi
+
+if [ "$verbose" = "true" ]; then
+  chmod -fR 777 "$tmp_directory"
+  rm -f "output_directory/centrifuge_out.tsv"
+  cp -fbRv "$tmp_directory/minimap2output/" "$output_directory"
+  cp -fbv "$tmp_directory/centrifuge"* "$output_directory"
+  cp -fbv "$tmp_directory/readIDTaxID"* "$output_directory"
+  cp -fbv "$tmp_directory/concatenated"* "$output_directory"
+  cp -fbv "$tmp_directory/mmp2_out.tsv" "$output_directory"
+
+  chmod -f 666 "$output_directory/readIDTaxID"*
+  chmod -f 666 "$output_directory/centrifuge"*
+  chmod -f 666 "$output_directory/concatenated"*
+  chmod -f 777 "$output_directory/minimap2output"
+  find "$output_directory/minimap2output/" -type f -exec chmod 666 {} \;
+  chmod -f 666 "$output_directory/mmp2_out.tsv"
+
+else
+  chmod -fR 777 "$tmp_directory"
+  cp -fbv "$tmp_directory/readIDTaxID"* "$output_directory"
+  chmod -f 666 "$output_directory/readIDTaxID"*
+
+fi
+
+endTime=$(date +%s.%N)
+echo ""
+echo "the skript ran for:"
+eval "echo $(date -ud "@$(echo "$endTime - $startTime" | bc)" +'$((%s/3600/24)) days %H hours %M minutes %S seconds.')"
