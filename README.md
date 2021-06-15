@@ -1,5 +1,11 @@
 # MetaPONT: Metagenomic Taxonomy Pipline for ONT sequencing
 
+The datasets used in the paper can be downloaded with:
+- 10_taxa:  ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/vfaBobqMOP6Zwkj/download"`
+- Gut:      ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/Delfe5tur3ke51Q/download"`
+- Tumor:    ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/2jRIHIHTGCkvLe4/download"`
+- Metamaps: ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/bRI2vLSsnMXjwZ0/download"`
+
 ## Installation
 
 MetaPONT runs Centrifuge and Minimap in a docker container. For the installation a working Docker installation is
@@ -24,8 +30,13 @@ docker build -t metapont .
 docker run metapont --help
 ```
 
-## Database building
+## Build Database
 
+A prebuild library (from the 2018 procaryotic centrifuge library) can be downloaded from here:  https://owncloud.gwdg.de/index.php/s/QFWoe44UKYGrbGQ
+
+For better results we suggest building a custom library, depending on you usecase.
+
+### Build a custom Database
 To build a usable database, you need a Centrifuge database. Please follow the instructions
 on https://github.com/DaehwanKimLab/centrifuge
 
