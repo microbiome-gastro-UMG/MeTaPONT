@@ -1,4 +1,4 @@
-# MetaPONT: Metagenomic Taxonomy Pipline for ONT sequencing
+# MetaPONT: Metagenomic Taxonomy Pipeline for ONT sequencing
 
 The datasets used in the paper can be downloaded with:
 - 10_taxa:  ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/vfaBobqMOP6Zwkj/download"`
