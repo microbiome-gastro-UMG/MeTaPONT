@@ -1,10 +1,12 @@
 # MetaPONT: Metagenomic Taxonomy Pipeline for ONT sequencing
 
-The datasets used in the paper can be downloaded with:
+The simulated datasets used in the paper can be downloaded with:
 - 10_taxa:  ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/vfaBobqMOP6Zwkj/download"`
 - Gut:      ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/Delfe5tur3ke51Q/download"`
 - Tumor:    ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/2jRIHIHTGCkvLe4/download"`
 - Metamaps: ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/bRI2vLSsnMXjwZ0/download"`
+
+More datasets with corresponding metadata are publicly available in Qiita (study number: 13720).
 
 ## Installation
 
