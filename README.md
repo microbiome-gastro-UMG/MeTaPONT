@@ -135,7 +135,7 @@ barcodes_swabfinding_16S:
 5 people collected buccal swabs at 2 consecutive days examining the buccal microbiome alteration due to food intake and drinking a glass of water. The first swab was collected in the morning before breakfast (condition 1), the second 5 minutes after eating (condition 2), the third 30 minutes after eating (condition 3), the fourth 240 minutes after eating (condition 4), afterwards all participants drank 200ml water and again swabs were collected 5 minutes after drinking (condition 5), 30 minutes after drinking (condition 6) and 240 minutes after drinking (condition7).
 
 Fastq-files and metadata:
-
+` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/6aGux5csVk7nzpg/download"`
 barcodes_dailyprofiles_16S: 
 ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/NTW7jDQCJV6QEew/download"`
 
@@ -153,6 +153,9 @@ Buccal and rectal swabs were collected from one individual and DNA was extracted
 
 
 Fastq-files and metadata:
+` wget –content-disposition ""`
+barcodes_alpha_16S: 
+` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/II2ZNtg9R8F2Dfh/download"`
 
 5. Alpha metagenomics
 Buccal and rectal swabs were collected from one individual and DNA was extracted with 4 different DNA-extraction kits: MagMAX Microbiome Ultra Nucleic Acid Isolation Kit (Applied Biosystems), PureLink™ Microbiome DNA Purification Kit (Invitrogen), QIAmp DNA Investigator Kit (Qiagen) and QIAmp DNA Microbiome Kit (Qiagen). Two protocols were applied for all but the last kit: the original, according to manufacturers' protocol and a protocol modified according to International Human Microbiome Standard. The aim of this experiment was to detect the most reliable DNA extraction protocol for metagenomic ONT-sequences.
