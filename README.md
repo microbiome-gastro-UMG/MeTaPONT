@@ -119,9 +119,9 @@ Docker run -v /path/to/database:/database -v /path/to/input:/input -v /path/to/o
 
 # Comprehensive wet-bench and bioinformatics workflow for complex microbiota using Oxford Nanopore Technologies
 
-In our published article "Comprehensive wet-bench and bioinformatics workflow for complex microbiota using Oxford Nanopore Technologies" in mSystems (2021) we present a comprehensive analysis pipeline with sampling, storage, DNA extraction, library preparation, and bioinformatical evaluation for complex microbiomes sequenced with ONT (DOI:10.1128/mSystems.00750-21). 
+In our published article "Comprehensive wet-bench and bioinformatics workflow for complex microbiota using Oxford Nanopore Technologies" in mSystems (2021) we present a comprehensive analysis pipeline with sampling, storage, DNA extraction, library preparation and bioinformatical evaluation for complex microbiomes sequenced with ONT (DOI:10.1128/mSystems.00750-21). 
 
-This study consists of 6 different experiments. Here we provide download links for fatst-files and metadata (zipped together). During classification all fastq files will be merged/concatenated. To reorder the trimmed reads to their belonging samples we provide barcode.txt files for every experiment. With following commands these files can be downloaded:
+This study consists of 6 different experiments. Here we provide download links for fastq-files and metadata (zipped together). During classification all fastq files will be merged/concatenated. To reorder the trimmed reads to their belonging samples we provide barcode.txt files for every experiment. With the following commands these files can be downloaded:
 
 1. Swab finding
 One stool sample was used to evaluate the reliability of different swabs (eSwab, eNAT, both  purchased from Copan) compared to direct DNA extraction (some stool was directly entered into the lysis buffer). All three kinds of collection methods were stored under different conditions: room temperature, -20° C, -80° C for 3 or 7 days or were directly extracted (day 0). 
