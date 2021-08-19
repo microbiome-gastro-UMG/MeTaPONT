@@ -153,7 +153,7 @@ Buccal and rectal swabs were collected from one individual and DNA was extracted
 
 
 Fastq-files and metadata:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/JN3dW0j0NO3uutr/download"`
+` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/H4HIweMfZwPUdQc/download"`
 barcodes_alpha_16S: 
 ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/II2ZNtg9R8F2Dfh/download"`
 
