@@ -144,7 +144,7 @@ barcodes_dailyprofiles_16S:
 Rectal swabs from one individual were collected with 3 different grades of stool/contamination (0,+,++).
 
 Fastq-files and metadata:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/fRVT57sodRAtYBy/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/tHQkhM4SkrDXTvi/download"`
 barcodes_gradeofstool_metagenomics: 
 ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/RxVC2AgMabTl5yy/download"`
 
