@@ -127,17 +127,17 @@ This study consists of 6 different experiments. Here we provide download links f
 One stool sample was used to evaluate the reliability of different swabs (eSwab, eNAT, both  purchased from Copan) compared to direct DNA extraction (some stool was directly entered into the lysis buffer). All three kinds of collection methods were stored under different conditions: room temperature, -20° C, -80° C for 3 or 7 days or were directly extracted (day 0). 
 
 Fastq-files and metadata:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/U7SJM6NlrZNgmkz/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/U7SJM6NlrZNgmkz/download"`
 barcodes_swabfinding_16S:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/humpM6O2hJ1AWob/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/humpM6O2hJ1AWob/download"`
 
 2. Daily profiles
 5 people collected buccal swabs at 2 consecutive days examining the buccal microbiome alteration due to food intake and drinking a glass of water. The first swab was collected in the morning before breakfast (condition 1), the second 5 minutes after eating (condition 2), the third 30 minutes after eating (condition 3), the fourth 240 minutes after eating (condition 4), afterwards all participants drank 200ml water and again swabs were collected 5 minutes after drinking (condition 5), 30 minutes after drinking (condition 6) and 240 minutes after drinking (condition7).
 
 Fastq-files and metadata:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/6aGux5csVk7nzpg/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/6aGux5csVk7nzpg/download"`
 barcodes_dailyprofiles_16S: 
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/NTW7jDQCJV6QEew/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/NTW7jDQCJV6QEew/download"`
 
 
 3. Grade of stool
@@ -146,25 +146,25 @@ Rectal swabs from one individual were collected with 3 different grades of stool
 Fastq-files and metadata:
 ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/tHQkhM4SkrDXTvi/download"`
 barcodes_gradeofstool_metagenomics: 
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/RxVC2AgMabTl5yy/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/RxVC2AgMabTl5yy/download"`
 
 4. Alpha 16S rRNA
 Buccal and rectal swabs were collected from one individual and DNA was extracted with 4 different DNA-extraction kits: MagMAX Microbiome Ultra Nucleic Acid Isolation Kit (Applied Biosystems), PureLink™ Microbiome DNA Purification Kit (Invitrogen), QIAmp DNA Investigator Kit (Qiagen) and QIAmp DNA Microbiome Kit (Qiagen). Two protocols were applied for all but the last kit: the original, according to manufacturers' protocol and a protocol modified according to International Human Microbiome Standard. The aim of this experiment was to detect the most reliable DNA extraction protocol for 16S rRNA ONT-sequences.  
 
 
 Fastq-files and metadata:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/H4HIweMfZwPUdQc/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/H4HIweMfZwPUdQc/download"`
 barcodes_alpha_16S: 
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/II2ZNtg9R8F2Dfh/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/II2ZNtg9R8F2Dfh/download"`
 
 5. Alpha metagenomics
 Buccal and rectal swabs were collected from one individual and DNA was extracted with 4 different DNA-extraction kits: MagMAX Microbiome Ultra Nucleic Acid Isolation Kit (Applied Biosystems), PureLink™ Microbiome DNA Purification Kit (Invitrogen), QIAmp DNA Investigator Kit (Qiagen) and QIAmp DNA Microbiome Kit (Qiagen). Two protocols were applied for all but the last kit: the original, according to manufacturers' protocol and a protocol modified according to International Human Microbiome Standard. The aim of this experiment was to detect the most reliable DNA extraction protocol for metagenomic ONT-sequences.
 
 
 Fastq-files and metadata:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/yynUitr81pGttPt/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/yynUitr81pGttPt/download"`
 barcodes_alpha_metagenomics:
-` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/5qxAlNX8nCTonvk/download"`
+` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/5qxAlNX8nCTonvk/download"`
 
 6. Mock community
 A mock community was purchased from ZymoResearch (https://www.zymoresearch.de/collections/zymobiomics-microbial-community-standards/products/zymobiomics-gut-microbiome-standard) containing 15 bacterial species and 2 fungi. With this mock community Metapont was validated.   
@@ -175,9 +175,9 @@ Fastq-files:
 
 The simulated datasets used in the paper can be downloaded with:
 - 10_taxa:  ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/vfaBobqMOP6Zwkj/download"`
-- Gut:      ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/Delfe5tur3ke51Q/download"`
-- Tumor:    ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/2jRIHIHTGCkvLe4/download"`
-- Metamaps: ` wget –content-disposition "https://owncloud.gwdg.de/index.php/s/bRI2vLSsnMXjwZ0/download"`
+- Gut:      ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/Delfe5tur3ke51Q/download"`
+- Tumor:    ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/2jRIHIHTGCkvLe4/download"`
+- Metamaps: ` wget --content-disposition "https://owncloud.gwdg.de/index.php/s/bRI2vLSsnMXjwZ0/download"`
 
 More datasets with corresponding metadata are publicly available in Qiita (study number: 13720).
 
