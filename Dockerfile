@@ -43,4 +43,3 @@ RUN chmod 777 /files
 
 WORKDIR /
 ENTRYPOINT ["/src/metapont"]
-CMD ["--help"]
