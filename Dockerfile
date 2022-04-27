@@ -6,24 +6,31 @@ WORKDIR /
 
 RUN apt-get update && apt-get -y upgrade
 
-RUN apt-get -y install cdbfasta
-RUN apt-get -y install bc
-RUN apt-get -y install python3
+RUN apt-get update && apt-get -y install cdbfasta
+RUN apt-get update && apt-get -y install bc
+RUN apt-get update && apt-get -y install python3
 RUN apt-get update && apt-get -y install python3-pip
+RUN apt-get update && apt-get -y install wget
+RUN apt-get update && apt-get -y install unzip
 RUN pip3 install pandas
 
-RUN apt-get -y install git
+RUN apt-get update && apt-get -y install git
 
 #Centrifuge
 WORKDIR /programs
-RUN git clone https://github.com/infphilo/centrifuge
+RUN wget https://github.com/DaehwanKimLab/centrifuge/archive/refs/tags/v1.0.4-beta.zip
+RUN unzip v1.0.4-beta.zip
+RUN mv centrifuge-1.0.4-beta centrifuge
 WORKDIR /programs/centrifuge
 RUN make
 ENV PATH "$PATH:/programs/centrifuge/"
 
 #minimap2
 WORKDIR /programs
-RUN git clone https://github.com/lh3/minimap2
+RUN wget https://github.com/lh3/minimap2/archive/refs/tags/v2.17.zip
+RUN unzip v2.17.zip
+RUN rm -rf v2.17.zip
+RUN mv minimap2-2.17 minimap2
 WORKDIR /programs/minimap2
 RUN make
 ENV PATH "$PATH:/programs/minimap2/"
