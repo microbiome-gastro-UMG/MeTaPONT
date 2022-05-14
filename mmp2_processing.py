@@ -4,6 +4,7 @@
 import os
 import sys
 import pandas as pd
+import warnings
 
 
 def thresholds(as_threshold, cov_threshold, mmp_df, output_dir):
@@ -54,13 +55,16 @@ if __name__ == '__main__':
     for file in paf_files:
         if not file.endswith(".paf"):
             continue
-        tmp_df = pd.read_csv(output_dir + '/minimap2output/' + file, index_col=False, sep='\t',
+            
+        with warnings.catch_warnings():
+            warnings.simplefilter(action='ignore')
+            tmp_df = pd.read_csv(output_dir + '/minimap2output/' + file, index_col=False, on_bad_lines='warn', sep=' |\t', header=None,
                              names=['readID', 'query_length', 'query_start', 'query_end',
                                     'query_strand',
                                     'taxID', 'target_length', 'target_start', 'target_end',
                                     'matches', 'alignment_length', 'Qscore',
                                     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
-
+            
         tmp_df['taxID'].values[:] = int(file.split(".")[0])  # set taxID to taxID
         tmp_df['alignment_length'] = pd.to_numeric(tmp_df['alignment_length'], errors='coerce')
         tmp_df['query_length'] = pd.to_numeric(tmp_df['query_length'], errors='coerce')
