@@ -25,9 +25,7 @@ if __name__ == '__main__':
 
 
     def command(taxid, fasta_index=fasta_index, wd=wd, conversiontable=conversiontable):
-        cmd = f"awk '$2=={taxid}' {conversiontable} | cut -f1 | cdbyank {fasta_index} | gzip -9 > {wd}/fastaTaxID/{taxid}.gz; " \
-              f"if [[ ! -n \"$(gunzip < {wd}/fastaTaxID/{taxid}.gz | head -c 1 | tr '\0\n' __) \" ]]; " \
-              f"then rm -f {wd}/fastaTaxID/{taxid}.gz; fi "
+        cmd = f"awk '$2=={taxid}' {conversiontable} | cut -f1 | cdbyank {fasta_index} | gzip -9 > {wd}/fastaTaxID/{taxid}.gz; "
         subprocess.run(cmd, input='\n'.join(df[df['taxid'] == taxid]['name'].values), encoding='ascii', shell=True)
 
 
